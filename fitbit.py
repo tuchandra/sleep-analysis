@@ -6,6 +6,7 @@ import base64
 import json
 import datetime
 
+
 # Instructions: Register your app with Fitbit Developers, and obtain a 
 # client ID and client secret. Modify secrets.py to contain these two values.
 # Next, go to the URL:
@@ -156,12 +157,18 @@ def pull_sleep_data(auth_token, start=None):
             print('Could not write sleep data for {0}.'.format(str(date)))
             return
 
-        fpath = write_dir + str(date) + '.txt'
+        fpath = write_dir + str(date) + '.json'
 
         with open(fpath, 'a') as output:
-            output.write(str(sleep_data))
+            # Data needs to be formatted as proper JSON, which means replacing
+            # ' with " and changing booleans to lowercase.
+            formatted_data = str(sleep_data).replace("'", '"')
+            formatted_data = formatted_data.replace('True', 'true')
+            formatted_data = formatted_data.replace('False', 'false')
+            
+            output.write(formatted_data)
 
-        print('Wrote sleep data to file /logs/{0}.txt'.format(str(date)))
+        print('Wrote sleep data to file /logs/{0}.json'.format(str(date)))
 
     # If there were more than 150 requests, notify user and provide the date
     # to start on next time. The only time the try statement will fail is if
@@ -182,6 +189,10 @@ if __name__ == "__main__":
 
     except IndexError:
         start_date = None
-        
+
     token = get_token()
+
+    if not token:
+        sys.exit(1)
+
     pull_sleep_data(token, start_date)
