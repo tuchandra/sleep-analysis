@@ -1,12 +1,14 @@
 # sleep-analysis
 A Python project to analyze my Fitbit sleep data.
 
+![Spring quarter sleep durations versus bedtimes](sample-image.png?raw=true)
+
 ## Overview
-This is a Python 3 project to obtain and analyze data on my sleep patterns, which has been collected nightly since July 2015 on my Fitbit Charge HR. The first part of the project is a script to access 11 months of minute-by-minute sleep logs; this can be used by anyone hoping to access their personal data. The second part is data analysis.
+This is a Python 3 project to obtain and analyze data on my sleep patterns, which has been collected nightly since July 2015 on my Fitbit Charge HR. The first part of the project is a script to access 11 months of sleep logs; this script can be used by anyone hoping to access their data. The second part is the data analysis, in which I look into my spring sleep habits.
 
-My primary goal for this project is to gain insight into my sleep patterns -- ambiguous, yes, but at the time I started the project, I did not know what I would learn. Secondary goals include learning to use Fitbit's API and the OAuth 2.0 protocol, understanding how to work with large datasets, and introducing myself to Junyper notebooks.
+My primary goal for this project was to gain insight into my sleep patterns -- ambiguous, yes, but at the time I started the project, I did not know what I would learn. Other goals include learning to use Fitbit's API and the OAuth 2.0 protocol, understanding how to work with large datasets, and introducing myself to Jupyter notebooks.
 
-Note: Fitbit is a registered trademark and service mark of Fitbit, Inc. My sleep analysis project is designed for personal use with the Fitbit platform. This product is not put out by Fitbit, and Fitbit does not service or warrant the functionality of this product.x
+Note: Fitbit is a registered trademark and service mark of Fitbit, Inc. My sleep analysis project is designed for personal use with the Fitbit platform. This product is not put out by Fitbit, and Fitbit does not service or warrant the functionality of this product.
 
 ## Part 1: Obtaining Minute-by-Minute Sleep Data
 The first part of this project involves accessing my nightly, minute-by-minute sleep data from Fitbit's servers. Fitbit does not usually provide this through their smartphone or desktop apps; users can only generally see summary statistics. In order to access them, I had to use Fitbit's API and request it directly from their servers.
@@ -34,4 +36,4 @@ If the start date is not entered, a default date of 150 days ago is chosen.
 All libraries used are part of Python's standard library.
 
 ## Part 2: Data Analysis
-Coming soon!
+Refer to `spring-sleep-analysis.ipynb` for the data analysis. This was done through a Jupyter notebook, making use of my spring quarter sleep data. Further detail is provided in that file; the image above is taken from the notebook.
