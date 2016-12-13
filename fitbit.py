@@ -1,3 +1,31 @@
+"""Tool to pull intraday sleep data from Fitbit.
+
+Register your app as a "personal app" with Fitbit Developers, online at
+<https://dev.fitbit.com/apps/new>. Obtain a Client ID and Client Secret. Create
+a separate file, secrets.py, that contains these two values. Go to the URL
+
+https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=######&scope=sleep
+
+with ###### replaced by your Client ID, then read the code off the end of the
+URL to which you are redirected. Add this to secrets.py. That should look like:
+
+    CLIENT_ID = ''
+    CLIENT_SECRET = ''
+    AUTH_CODE = ''
+
+with only the three constants. You can then run this from the command line.
+
+Usage:
+    fitbit.py
+    fitbit.py <start date>
+
+Details:
+    The start date should be written as yyyy-mm-dd (e.g., 2016-12-14). Note
+    that if the start date was more than 150 days in the past, the script
+    will terminate after 150 days of data, as 150/hour is the rate limit for
+    the Fitbit API.
+"""
+
 import secrets  # Python file with IDs and keys
 
 import base64
@@ -6,18 +34,6 @@ import json
 import os
 import sys
 import urllib.request, urllib.parse
-
-
-# Instructions: Register your app with Fitbit Developers, and obtain a 
-# client ID and client secret. Modify secrets.py to contain these two values.
-# Next, go to the URL:
-#
-# https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=227VVG&scope=sleep
-#
-# and read the code off the URL to which you are redirected. Modify the
-# constant AUTH_CODE in secrets.py. You are then able to run this file from
-# the command line as "python fitbit.py <start date>" with <start date> being
-# optional, formatted at yyyy-mm-dd.
 
 
 def string_to_date(date_string):
