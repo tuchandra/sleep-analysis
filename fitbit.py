@@ -1,10 +1,11 @@
 import secrets  # Python file with IDs and keys
 
-import os, sys
-import urllib.request, urllib.parse
 import base64
-import json
 import datetime
+import json
+import os
+import sys
+import urllib.request, urllib.parse
 
 
 # Instructions: Register your app with Fitbit Developers, and obtain a 
