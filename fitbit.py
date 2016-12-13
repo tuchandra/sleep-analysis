@@ -4,9 +4,9 @@ Register your app as a "personal app" with Fitbit Developers, online at
 <https://dev.fitbit.com/apps/new>. Obtain a Client ID and Client Secret. Create
 a separate file, secrets.py, that contains these two values. Go to the URL
 
-https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=######&scope=sleep
+https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=XXXXXX&scope=sleep
 
-with ###### replaced by your Client ID, then read the code off the end of the
+with XXXXXX replaced by your Client ID, then read the code off the end of the
 URL to which you are redirected. Add this to secrets.py. That should look like:
 
     CLIENT_ID = ''
@@ -26,14 +26,16 @@ Details:
     the Fitbit API.
 """
 
-import secrets  # Python file with IDs and keys
-
 import base64
 import datetime
 import json
 import os
 import sys
-import urllib.request, urllib.parse
+
+from urrlib import parse
+from urllib import request
+
+import secrets  # Python file with IDs and keys
 
 
 def string_to_date(date_string):
