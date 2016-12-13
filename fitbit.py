@@ -37,36 +37,38 @@ import urllib.request, urllib.parse
 
 
 def string_to_date(date_string):
-    ''' Convert date string YYYY-MM-DD to a date object. '''
+    """Utility: convert date string YYYY-MM-DD to a date object."""
 
     d = datetime.datetime.strptime(date_string, '%Y-%m-%d')
     return d.date()
 
 
 def get_date_list(start):
-    ''' Create a list of all Dates between the current date and the provided
-    start date.
+    """Create list of Dates between current date and provided start date
 
-    params: start = start date for the list, string formmated 'YYYY-MM-DD'
-    return: list of date objects, []
-    '''
+    params: 
+        start: start date for the list, string formmated 'YYYY-MM-DD'
+    return: 
+        list of Date objects
+    """
 
     end = datetime.date.today()
     start = string_to_date(start)
     delta = end - start
 
-    days_list = [start + datetime.timedelta(days = i) for i in range(delta.days + 1)]
+    d = [start + datetime.timedelta(days = i) for i in range(delta.days + 1)]
 
-    return days_list
+    return d
 
 
 def send_request(request):
+    """Send HTTP request; return response.
 
-    ''' Send a request and return a response. 
-
-    params: request = Request object
-    return: json response or None
-    '''
+    params:
+        request: Request object (with headers, etc.)
+    return:
+        JSON response, or None
+    """
 
     try:
         response = urllib.request.urlopen(request)
@@ -80,13 +82,9 @@ def send_request(request):
 
 
 def get_token():
-    ''' Obtains an access token from Fitbit. 
-
-    Returns response given by the server.
-    '''
+    """Obtains access token from Fitbit; returns response from server."""
 
     # Secrets stored in a separate file. 
-    # Refer to README.md for instructions on how to obtain these.
     CLIENT_ID = secrets.CLIENT_ID
     CLIENT_SECRET = secrets.CLIENT_SECRET
     AUTH_CODE = secrets.AUTH_CODE
@@ -123,7 +121,7 @@ def get_token():
 
 
 def pull_sleep_data(auth_token, start=None):
-    ''' Extracts sleep data from Fitbit API and writes to text file.
+    """Extracts sleep data from Fitbit API and writes to text file.
 
     Submits requests to the Fitbit API for a sequence of days starting
     at a given day ('start'). The start date must be within 150 days of the
@@ -131,10 +129,11 @@ def pull_sleep_data(auth_token, start=None):
     all sleep data, it is necessary to run several times with varying start
     dates.
 
-    params: auth_token = from Fitbit for making requests; see get_token()
-            start = start date to pull sleep data from (yyyy-mm-dd)
-    return: nothing    
-    '''
+    params:
+        auth_token: from Fitbit for making requests; see get_token()
+        start: start date to pull sleep data from, format 'yyyy-mm-dd'
+    return: nothing
+    """
 
     if not auth_token:
         print('Error: Authentication failed')
