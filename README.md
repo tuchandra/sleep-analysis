@@ -4,9 +4,9 @@ A Python project to analyze my Fitbit sleep data.
 ## Overview
 ![Spring quarter sleep durations versus bedtimes](sample-image.png?raw=true)
 
-This is a Python 3 project to obtain and analyze data on my sleep patterns, which has been collected nightly since July 2015 on my Fitbit Charge HR. The first part of the project is a script to access 11 months of sleep logs; this script can be used by anyone hoping to access their data. The second part is the data analysis, in which I look into my spring sleep habits.
+This is a Python 3 project to obtain and analyze data on my sleep patterns, which has been collected nightly since July 2015 on my Fitbit Charge HR. The first part of the project is a script to access my nightly sleep logs; this script can be used by anyone hoping to access their data. The second part is the data analysis, in which I look into my spring sleep habits.
 
-My primary goal for this project was to gain insight into my sleep patterns -- ambiguous, yes, but at the time I started the project, I did not know what I would learn. Other goals include learning to use Fitbit's API and the OAuth 2.0 protocol, understanding how to work with large datasets, and introducing myself to Jupyter notebooks.
+My primary goal for this project was to gain insight into my sleep patterns -- ambiguous, yes, but at the time I started the project, I did not know what I would learn. Other goals include learning to use Fitbit's API and the OAuth 2.0 protocol, understanding how to work with large datasets, and introducing myself to data analysis in Python.
 
 Note: Fitbit is a registered trademark and service mark of Fitbit, Inc. My sleep analysis project is designed for personal use with the Fitbit platform. This product is not put out by Fitbit, and Fitbit does not service or warrant the functionality of this product.
 
