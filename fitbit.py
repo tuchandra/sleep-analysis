@@ -32,8 +32,7 @@ import json
 import os
 import sys
 
-from urrlib import parse
-from urllib import request
+import requests
 
 import secrets  # Python file with IDs and keys
 
@@ -63,26 +62,6 @@ def get_date_list(start):
     return d
 
 
-def send_request(request):
-    """Send HTTP request; return response.
-
-    params:
-        request: Request object (with headers, etc.)
-    return:
-        JSON response, or None
-    """
-
-    try:
-        response = urllib.request.urlopen(request)
-        response_json = json.loads(response.read().decode())
-
-    except Exception as e:
-        print('Error: Request failed')
-        print(e.read())
-
-    return response_json if response_json else None
-
-
 def get_token():
     """Obtains access token from Fitbit; returns response from server."""
 
@@ -104,22 +83,15 @@ def get_token():
                  'redirect_uri': 'https://github.com/tuchandra/sleep-analysis'
                  }
 
-    encoded_post_data = urllib.parse.urlencode(post_data).encode()
+    # Proper format for the code is b64-encoded; to do this, encode to
+    # a bytestring then encode to b64, then decode it. 
+    encoded_ID = base64.b64encode(FULL_ID.encode()).decode()
+    header = {'Authorization': 'Basic ' + encoded_ID}
+    
+    req = requests.post(token_url, data = post_data, headers = header)
+    print req.json()
 
-    # Create the request; proper format for the code is b64-encoded; to do
-    # this, though, we have to encode the string to a bytestring first, 
-    # then b64-encode it, then decode it to a regular string.
-    req = urllib.request.Request(token_url, data = encoded_post_data)
-    req.add_header('Authorization', 'Basic ' + base64.b64encode(FULL_ID.encode()).decode())
-
-    # Send the request.
-    auth_token = send_request(req)
-
-    if not auth_token:
-        print('Error: could not authenticate.')
-        return
-
-    return auth_token
+    return req.json()
 
 
 def pull_sleep_data(auth_token, start=None):
@@ -166,10 +138,10 @@ def pull_sleep_data(auth_token, start=None):
     # Fitbit API limits requests to 150 per hour, so 150 at a time
     for date in dates[:150]:
         # Format request and headers
-        req = urllib.request.Request(request_stem + str(date) + '.json')
-        req.add_header('Authorization', token_type + ' ' + token)
+        req_url = request_stem + str(date) + '.json'
+        header = {'Authorization': token_type + ' ' + token}
 
-        sleep_data = send_request(req)
+        sleep_data = requests.post(req_url, headers = header).json()
 
         if not sleep_data:
             print('Could not write sleep data for {0}.'.format(str(date)))
