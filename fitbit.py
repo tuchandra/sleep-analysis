@@ -89,7 +89,6 @@ def get_token():
     header = {'Authorization': 'Basic ' + encoded_ID}
     
     req = requests.post(token_url, data = post_data, headers = header)
-    print req.json()
 
     return req.json()
 
