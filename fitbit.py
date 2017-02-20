@@ -30,9 +30,8 @@ import base64
 import datetime
 import json
 import os
-import sys
-
 import requests
+import sys
 
 import secrets  # Python file with IDs and keys
 
