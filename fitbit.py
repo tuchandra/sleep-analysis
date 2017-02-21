@@ -89,6 +89,9 @@ def get_token():
     
     req = requests.post(token_url, data = post_data, headers = header)
 
+    if not req.json()['success']:
+        print('Authentication failed')
+
     return req.json()
 
 
