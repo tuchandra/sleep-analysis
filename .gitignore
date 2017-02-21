@@ -1,4 +1,4 @@
-secrets.py 
+credentials/
 logs/
 
 # Byte-compiled / optimized / DLL files
