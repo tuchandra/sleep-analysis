@@ -33,6 +33,8 @@ import os
 import requests
 import sys
 
+import oauth2client
+
 import secrets  # Python file with IDs and keys
 
 
@@ -61,41 +63,89 @@ def get_date_list(start):
     return d
 
 
-def get_token():
-    """Obtains access token from Fitbit; returns response from server."""
+def get_access_token(refresh_token = None):
+    """Get Fitbit access token, according to OAuth2 flow.
 
-    # Secrets stored in a separate file. 
-    CLIENT_ID = secrets.CLIENT_ID
-    CLIENT_SECRET = secrets.CLIENT_SECRET
-    AUTH_CODE = secrets.AUTH_CODE
+    Use client_secret file to obtain an authorization code, then exchange the
+    code for an access token, per OAuth2 specification.
 
-    FULL_ID = CLIENT_ID + ':' + CLIENT_SECRET
+    If refresh_token is specified, this uses it to obtain a new access token
+    without the user having to reauthenticate.
 
-    # Fitbit Token URL
-    token_url = 'https://api.fitbit.com/oauth2/token'
+    params: 
+        refresh_token - if specified, generates a new access token using this
+    return:
+        access_token - JSON object
+    """
 
-    # Data for the POST request; refer to Fitbit developers website for standards
-    # and requirements.
-    post_data = {'code': AUTH_CODE, 
-                 'grant_type': 'authorization_code', 
-                 'client_id': CLIENT_ID, 
-                 'redirect_uri': 'https://github.com/tuchandra/sleep-analysis'
-                 }
+    ### Find and read client_secret
+    # Format of file:
+    # { "web" : { "auth_uri" : "...",
+    #             "token_uri" : "...",
+    #             "redirect_uris" : [ ... ],
+    #             "client_id" : "...",
+    #             "client_secret" : "...",
+    #            }
+    #  }
+    #
 
-    # Proper format for the code is b64-encoded; to do this, encode to
-    # a bytestring then encode to b64, then decode it. 
-    encoded_ID = base64.b64encode(FULL_ID.encode()).decode()
-    header = {'Authorization': 'Basic ' + encoded_ID}
-    
-    req = requests.post(token_url, data = post_data, headers = header)
+    secret_file = "credentials/client_secret.json"
 
-    if not req.json()['success']:
-        print('Authentication failed')
+    with open(secret_file) as f:
+        secret_contents = json.loads(f.read())
+        secret_contents = secret_contents['web']
 
-    return req.json()
+    # Unpack contents
+    client_id = secret_contents['client_id']
+    client_secret = secret_contents['client_secret']
+    redirect_uri = secret_contents['redirect_uris'][0]
+    auth_uri = secret_contents['auth_uri']  # Not used
+    token_uri = secret_contents['token_uri']
+
+    # If refresh token specified, we don't need to reauthenticate; just set up
+    # the request to refresh our access token
+    if refresh_token:
+        data = "grant_type=refresh_token&refresh_token={0}".format(refresh_token)
+
+    # Otherwise, generate new auth code and access token
+    else:
+        # User needs to go to a link in their browser and give us the callback URL;
+        # might be possible to do this with some module in the future.
+        auth_url = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id={0}&scope=sleep".format(client_id)
+        print('Please go here and authorize access:\n\n{0}\n'.format(auth_url))
+        auth_response = input('Enter the full redirected URL: ')
+        
+        # Format of callback URL is https:/.../whatever?code=auth_code#_=_
+        # and we just want the code
+        auth_code = auth_response.split("?")[-1]
+        auth_code = auth_code[5:-4]
+
+        # Exchange auth_code for access token
+        data = "client_id={0}&code={1}&grant_type=authorization_code".format(client_id, auth_code)
+
+    # Generate headers; see Fitbit docs for specifications
+    full_id = client_id + ":" + client_secret
+    encoded_ID = base64.b64encode(full_id.encode()).decode().strip()
+    headers = {'Authorization': 'Basic ' + encoded_ID,
+               'Content-Type': 'application/x-www-form-urlencoded'}
+
+    token = requests.post(token_uri, data = data, headers = headers)
+
+    # Write token to file
+    if token.status_code == 200:
+        print("Successfully authenticated and obtained access token.")
+
+        with open("credentials/fitbit_token.json", "w") as f:
+            json.dump(token_json, f)
+
+    else:  # failed
+        print (token.json())
+        return None
+
+    return token.json()
 
 
-def pull_sleep_data(auth_token, start=None):
+def pull_sleep_data(token, start=None):
     """Extracts sleep data from Fitbit API and writes to text file.
 
     Submits requests to the Fitbit API for a sequence of days starting
@@ -105,19 +155,18 @@ def pull_sleep_data(auth_token, start=None):
     dates.
 
     params:
-        auth_token: from Fitbit for making requests; see get_token()
+        token: from Fitbit for making requests; see get_token()
         start: start date to pull sleep data from, format 'yyyy-mm-dd'
-    return: nothing
+    return: 
+        401 if access token was expired, else None
     """
 
-    if not auth_token:
-        print('Error: Authentication failed')
-        return
+    token = json.loads(token)
 
-    token = auth_token['access_token']
-    refresh_token = auth_token['refresh_token']
-    token_type = auth_token['token_type']
-    user_id = auth_token['user_id']
+    access_token = token['access_token']
+    refresh_token = token['refresh_token']  # not used
+    token_type = token['token_type']
+    user_id = token['user_id']
 
     request_stem = 'https://api.fitbit.com/1/user/' + user_id + '/sleep/date/'
 
@@ -140,20 +189,20 @@ def pull_sleep_data(auth_token, start=None):
     for date in dates[:150]:
         # Format request and headers
         req_url = request_stem + str(date) + '.json'
-        header = {'Authorization': token_type + ' ' + token}
+        header = {'Authorization': token_type + ' ' + access_token}
 
-        sleep_data = requests.post(req_url, headers = header).json()
+        sleep_data = requests.post(req_url, headers = header)
 
-        if not sleep_data:
-            print('Could not write sleep data for {0}.'.format(str(date)))
-            return
+        if sleep_data.status_code == 401:
+            print("Access token expired; refreshing and trying again.")
+            return 401
 
         fpath = write_dir + str(date) + '.json'
 
         with open(fpath, 'a') as output:
             # Data needs to be formatted as proper JSON, which means replacing
             # ' with " and changing booleans to lowercase.
-            formatted_data = str(sleep_data).replace("'", '"')
+            formatted_data = str(sleep_data.json()).replace("'", '"')
             formatted_data = formatted_data.replace('True', 'true')
             formatted_data = formatted_data.replace('False', 'false')
             
@@ -181,9 +230,25 @@ if __name__ == "__main__":
     except IndexError:
         start_date = None
 
-    token = get_token()
+    # Try to read token from file; otherwise, get new token
+    try:
+        with open("credentials/fitbit_token.json") as f:
+            token = f.read()
+            print("Successfully read access token from file.")
 
+    except:
+        print("Access token not found; generating new one.")
+        token = get_access_token()
+
+    # If token still doesn't exist, then we can't do anything else
     if not token:
+        print("Unable to generate access token; exiting.")
         sys.exit(1)
 
-    pull_sleep_data(token, start_date)
+    # Try to get data; if we have a return value, we need a new token
+    error = pull_sleep_data(token, start_date)
+
+    if error == 401:
+        print("Access token expired; refreshing token.")
+        refresh_token = token["refresh_token"]
+        token = get_access_token(refresh_token = refresh_token)
