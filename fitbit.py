@@ -134,6 +134,8 @@ def get_access_token(refresh_token = None):
         with open("credentials/fitbit_token.json", "w") as f:
             json.dump(token.json(), f)
 
+        print("Saved new access token to file.")
+
     else:  # failed
         print (token.json())
         return None
@@ -227,7 +229,7 @@ if __name__ == "__main__":
     # Try to read token from file; otherwise, get new token
     try:
         with open("credentials/fitbit_token.json") as f:
-            token = f.read().json()
+            token = json.load(f)
             print("Successfully read access token from file.")
 
     except:
