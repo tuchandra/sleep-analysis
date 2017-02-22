@@ -132,7 +132,7 @@ def get_access_token(refresh_token = None):
         print("Successfully authenticated and obtained access token.")
 
         with open("credentials/fitbit_token.json", "w") as f:
-            json.dump(token_json, f)
+            json.dump(token.json(), f)
 
     else:  # failed
         print (token.json())
@@ -156,8 +156,6 @@ def pull_sleep_data(token, start=None):
     return: 
         401 if access token was expired, else None
     """
-
-    token = json.loads(token)
 
     access_token = token['access_token']
     refresh_token = token['refresh_token']  # not used
@@ -229,7 +227,7 @@ if __name__ == "__main__":
     # Try to read token from file; otherwise, get new token
     try:
         with open("credentials/fitbit_token.json") as f:
-            token = f.read()
+            token = f.read().json()
             print("Successfully read access token from file.")
 
     except:
