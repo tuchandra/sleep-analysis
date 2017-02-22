@@ -33,10 +33,6 @@ import os
 import requests
 import sys
 
-import oauth2client
-
-import secrets  # Python file with IDs and keys
-
 
 def string_to_date(date_string):
     """Utility: convert date string YYYY-MM-DD to a date object."""
