@@ -245,6 +245,9 @@ if __name__ == "__main__":
     error = pull_sleep_data(token, start_date)
 
     if error == 401:
+        # Refresh token, then try again
         print("Access token expired; refreshing token.")
         refresh_token = token["refresh_token"]
         token = get_access_token(refresh_token = refresh_token)
+
+        pull_sleep_data(token, start_date)
