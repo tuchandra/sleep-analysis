@@ -190,7 +190,7 @@ def pull_sleep_data(token, start=None):
         sleep_data = requests.post(req_url, headers = header)
 
         if sleep_data.status_code == 401:
-            print("Access token expired; refreshing and trying again.")
+            print("Access token expired.")
             return 401
 
         fpath = write_dir + str(date) + '.json'
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 
     if error == 401:
         # Refresh token, then try again
-        print("Access token expired; refreshing token.")
+        print("Refreshing access token.")
         refresh_token = token["refresh_token"]
         token = get_access_token(refresh_token = refresh_token)
 
