@@ -1,19 +1,8 @@
 """Tool to pull intraday sleep data from Fitbit.
 
 Register your app as a "personal app" with Fitbit Developers, online at
-<https://dev.fitbit.com/apps/new>. Obtain a Client ID and Client Secret. Create
-a separate file, secrets.py, that contains these two values. Go to the URL
-
-https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=XXXXXX&scope=sleep
-
-with XXXXXX replaced by your Client ID, then read the code off the end of the
-URL to which you are redirected. Add this to secrets.py. That should look like:
-
-    CLIENT_ID = ''
-    CLIENT_SECRET = ''
-    AUTH_CODE = ''
-
-with only the three constants. You can then run this from the command line.
+<https://dev.fitbit.com/apps/new>. Fill out client_secret.json according
+to the guidelines in the README. You are then ready to pull your sleep data.
 
 Usage:
     fitbit.py
@@ -23,8 +12,10 @@ Details:
     The start date should be written as yyyy-mm-dd (e.g., 2016-12-14). Note
     that if the start date was more than 150 days in the past, the script
     will terminate after 150 days of data, as 150/hour is the rate limit for
-    the Fitbit API.
+    the Fitbit API. If the start date is not specified, it will choose a
+    date 150 days in the past.
 """
+
 
 import base64
 import datetime
