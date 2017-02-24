@@ -33,12 +33,12 @@ def string_to_date(date_string):
 
 
 def get_date_list(start):
-    """Create list of Dates between current date and provided start date
+    """Create list of date objects between current and provided start date.
 
     params: 
         start: start date for the list, string formmated 'YYYY-MM-DD'
     return: 
-        list of Date objects
+        list of date objects
     """
 
     end = datetime.date.today()
@@ -51,7 +51,7 @@ def get_date_list(start):
 
 
 def get_access_token(refresh_token = None):
-    """Get Fitbit access token, according to OAuth2 flow.
+    """Get Fitbit access token according to OAuth2 flow.
 
     Use client_secret file to obtain an authorization code, then exchange the
     code for an access token, per OAuth2 specification.
@@ -135,7 +135,7 @@ def get_access_token(refresh_token = None):
 
 
 def pull_sleep_data(token, start=None):
-    """Extracts sleep data from Fitbit API and writes to text file.
+    """Extracts sleep data from Fitbit API and writes to JSON files.
 
     Submits requests to the Fitbit API for a sequence of days starting
     at a given day ('start'). The start date must be within 150 days of the
