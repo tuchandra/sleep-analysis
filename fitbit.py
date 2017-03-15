@@ -36,7 +36,7 @@ def get_date_list(start):
     """Create list of date objects between current and provided start date.
 
     params: 
-        start: start date for the list, string formmated 'YYYY-MM-DD'
+        start: start date for the list, string formatted 'YYYY-MM-DD'
     return: 
         list of date objects
     """
@@ -186,14 +186,16 @@ def pull_sleep_data(token, start=None):
 
         fpath = write_dir + str(date) + '.json'
 
-        with open(fpath, 'a') as output:
+        with open(fpath, 'w') as output:
             # Data needs to be formatted as proper JSON, which means replacing
             # ' with " and changing booleans to lowercase.
-            formatted_data = str(sleep_data.json()).replace("'", '"')
+            formatted_data = str(sleep_data.json())
+            formatted_data = formatted_data.replace("'", '"')
             formatted_data = formatted_data.replace('True', 'true')
             formatted_data = formatted_data.replace('False', 'false')
+            formatted_data = json.loads(formatted_data)
             
-            output.write(formatted_data)
+            json.dump(formatted_data, output)
 
         print('Wrote sleep data to file /logs/{0}.json'.format(str(date)))
 
