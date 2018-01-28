@@ -167,8 +167,8 @@ def pull_sleep_data(token, start=None):
     # Get directory to write all files to, and create if necessary
     script_path = os.path.abspath(__file__)
     script_dir = os.path.split(script_path)[0]
-    write_dir = script_dir + '\\logs\\'
-
+    write_dir = os.path.join(script_dir, 'logs')
+    
     if not os.path.exists(write_dir):
         os.makedirs(write_dir)
 
@@ -184,7 +184,8 @@ def pull_sleep_data(token, start=None):
             print("Access token expired.")
             return 401
 
-        fpath = write_dir + str(date) + '.json'
+        fname = str(date) + '.json'
+        fpath = os.path.join(write_dir, fname)
 
         with open(fpath, 'w') as output:
             # Data needs to be formatted as proper JSON, which means replacing
@@ -197,7 +198,7 @@ def pull_sleep_data(token, start=None):
             
             json.dump(formatted_data, output)
 
-        print('Wrote sleep data to file /logs/{0}.json'.format(str(date)))
+        print('Wrote sleep data to file %s' % (fpath))
 
     # If there were more than 150 requests, notify user and provide the date
     # to start on next time. The only time the try statement will fail is if
